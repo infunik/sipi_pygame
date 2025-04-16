@@ -22,7 +22,8 @@ class Player:
         self.reset()
         
     def reset(self):
-        self.rect = pygame.Rect(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 20, 20)
+        self.size = 20  # Store current size as a property
+        self.rect = pygame.Rect(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, self.size, self.size)
         self.speed = 5
         
     def update(self, keys):
@@ -48,6 +49,22 @@ class Player:
             
     def draw(self, screen):
         pygame.draw.rect(screen, BLUE, self.rect)
+        
+    def grow(self, amount=2):
+        # Store current center position
+        center_x, center_y = self.rect.center
+        
+        # Increase size
+        self.size += amount
+        
+        # Cap size at a reasonable maximum
+        max_size = 60
+        self.size = min(self.size, max_size)
+        
+        # Update rect with new size while maintaining center position
+        self.rect.width = self.size
+        self.rect.height = self.size
+        self.rect.center = (center_x, center_y)
 
 # Obstacle class
 class Obstacle:
@@ -378,6 +395,7 @@ class Game:
             if bonus.collides_with(self.player.rect):
                 self.bonuses.remove(bonus)
                 self.score += 10
+                self.player.grow()  # Make player bigger when collecting a coin
     
     def game_over(self):
         self.state = self.GAME_OVER
